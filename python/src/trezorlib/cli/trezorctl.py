@@ -277,6 +277,19 @@ def change_pin(connect, remove):
 
 
 @cli.command()
+@click.option("-r", "--remove", is_flag=True)
+@click.pass_obj
+def change_wipe_code(connect, remove):
+    """Set or remove the wipe code.
+
+    The wipe code functions as a "self-destruct PIN". If the wipe code is ever
+    entered into any PIN entry dialog, then the device will be immediately
+    reset to factory defaults and all private data will be removed.
+    """
+    return device.change_wipe_code(connect(), remove)
+
+
+@cli.command()
 @click.argument("operation", type=CHOICE_SD_PROTECT_OPERATION_TYPE)
 @click.pass_obj
 def sd_protect(connect, operation):

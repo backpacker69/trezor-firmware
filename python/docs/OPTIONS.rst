@@ -25,6 +25,7 @@ Use the following command to see all options:
     cardano-get-public-key          Get Cardano public key.
     cardano-sign-tx                 Sign Cardano transaction.
     change-pin                      Set, change or remove PIN.
+    change-wipe-code                Set or remove the wipe code.
     clear-session                   Clear session (remove cached PIN, passphrase, etc.).
     cosi-commit                     Ask device to commit to CoSi signing.
     cosi-sign                       Ask device to sign using CoSi.
