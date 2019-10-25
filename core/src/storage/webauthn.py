@@ -1,6 +1,6 @@
 from micropython import const
 
-from apps.common.storage import common
+from storage import common
 from apps.webauthn.credential import Credential, Fido2Credential
 
 if False:

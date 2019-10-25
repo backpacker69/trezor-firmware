@@ -1,30 +1,22 @@
+import storage
+import storage.device
+from storage.sd_salt import is_sd_salt_enabled
 from trezor import config, io, log, loop, res, ui, utils
 from trezor.pin import pin_to_int, show_pin_timeout
 
-from apps.common import storage
 from apps.common.request_pin import PinCancelled, request_pin
 from apps.common.sd_salt import SdProtectCancelled, request_sd_salt
-from apps.common.storage import device as storage_device
-
-if False:
-    from typing import Optional
 
 
 async def bootscreen() -> None:
-    ui.display.orientation(storage_device.get_rotation())
-    salt_auth_key = storage_device.get_sd_salt_auth_key()
+    ui.display.orientation(storage.device.get_rotation())
 
     while True:
         try:
-            if salt_auth_key is not None or config.has_pin():
+            if is_sd_salt_enabled() or config.has_pin():
                 await lockscreen()
 
-            if salt_auth_key is not None:
-                salt = await request_sd_salt(
-                    None, salt_auth_key
-                )  # type: Optional[bytearray]
-            else:
-                salt = None
+            salt = await request_sd_salt()
 
             if not config.has_pin():
                 config.unlock(pin_to_int(""), salt)
@@ -47,8 +39,8 @@ async def bootscreen() -> None:
 
 
 async def lockscreen() -> None:
-    label = storage_device.get_label()
-    image = storage_device.get_homescreen()
+    label = storage.device.get_label()
+    image = storage.device.get_homescreen()
     if not label:
         label = "My Trezor"
     if not image:

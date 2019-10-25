@@ -2,7 +2,7 @@ from micropython import const
 
 from trezor.crypto import slip39
 
-from apps.common.storage import common, recovery_shares
+from storage import common, recovery_shares
 
 # Namespace:
 _NAMESPACE = common.APP_RECOVERY
