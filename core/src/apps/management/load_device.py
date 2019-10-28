@@ -1,6 +1,7 @@
 from trezor import config, wire
 from trezor.crypto import bip39, slip39
 from trezor.messages import BackupType
+from trezor.messages.LoadDevice import LoadDevice
 from trezor.messages.Success import Success
 from trezor.pin import pin_to_int
 from trezor.ui.text import Text
@@ -10,8 +11,11 @@ from apps.common.confirm import require_confirm
 from apps.common.storage import device as storage_device
 from apps.management import backup_types
 
+if False:
+    from trezor.messages.ResetDevice import EnumTypeBackupType
 
-async def load_device(ctx, msg):
+
+async def load_device(ctx: wire.Context, msg: LoadDevice) -> Success:
     word_count = _validate(msg)
     is_slip39 = backup_types.is_slip39_word_count(word_count)
 
@@ -22,7 +26,7 @@ async def load_device(ctx, msg):
 
     if not is_slip39:  # BIP-39
         secret = msg.mnemonics[0].encode()
-        backup_type = BackupType.Bip39
+        backup_type = BackupType.Bip39  # type: EnumTypeBackupType
     else:
         identifier, iteration_exponent, secret, group_count = slip39.combine_mnemonics(
             msg.mnemonics
@@ -48,7 +52,7 @@ async def load_device(ctx, msg):
     return Success(message="Device loaded")
 
 
-def _validate(msg) -> int:
+def _validate(msg: LoadDevice) -> int:
     if storage.is_initialized():
         raise wire.UnexpectedMessage("Already initialized")
 
@@ -68,7 +72,7 @@ def _validate(msg) -> int:
     return word_count
 
 
-async def _warn(ctx: wire.Context):
+async def _warn(ctx: wire.Context) -> None:
     text = Text("Loading seed")
     text.bold("Loading private seed", "is not recommended.")
     text.normal("Continue only if you", "know what you are doing!")

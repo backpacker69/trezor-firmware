@@ -1,13 +1,19 @@
 from trezor import ui, wire
 from trezor.messages import ButtonRequestType, PassphraseSourceType
+from trezor.messages.ApplySettings import ApplySettings
 from trezor.messages.Success import Success
 from trezor.ui.text import Text
 
 from apps.common.confirm import require_confirm
 from apps.common.storage import device as storage_device
 
+if False:
+    from typing_extensions import Literal
 
-async def apply_settings(ctx, msg):
+    PassphraseSourceEnumType = Literal[0, 1, 2]
+
+
+async def apply_settings(ctx: wire.Context, msg: ApplySettings) -> Success:
     if (
         msg.homescreen is None
         and msg.label is None
@@ -48,20 +54,20 @@ async def apply_settings(ctx, msg):
     return Success(message="Settings applied")
 
 
-async def require_confirm_change_homescreen(ctx):
+async def require_confirm_change_homescreen(ctx: wire.Context) -> None:
     text = Text("Set homescreen", ui.ICON_CONFIG)
     text.normal("Do you really want to", "change the homescreen", "image?")
     await require_confirm(ctx, text, ButtonRequestType.ProtectCall)
 
 
-async def require_confirm_change_label(ctx, label):
+async def require_confirm_change_label(ctx: wire.Context, label: str) -> None:
     text = Text("Change label", ui.ICON_CONFIG)
     text.normal("Do you really want to", "change the label to")
     text.bold("%s?" % label)
     await require_confirm(ctx, text, ButtonRequestType.ProtectCall)
 
 
-async def require_confirm_change_passphrase(ctx, use):
+async def require_confirm_change_passphrase(ctx: wire.Context, use: bool) -> None:
     text = Text("Enable passphrase" if use else "Disable passphrase", ui.ICON_CONFIG)
     text.normal("Do you really want to")
     text.normal("enable passphrase" if use else "disable passphrase")
@@ -69,7 +75,9 @@ async def require_confirm_change_passphrase(ctx, use):
     await require_confirm(ctx, text, ButtonRequestType.ProtectCall)
 
 
-async def require_confirm_change_passphrase_source(ctx, source):
+async def require_confirm_change_passphrase_source(
+    ctx: wire.Context, source: PassphraseSourceEnumType
+) -> None:
     if source == PassphraseSourceType.DEVICE:
         desc = "ON DEVICE"
     elif source == PassphraseSourceType.HOST:
@@ -82,7 +90,9 @@ async def require_confirm_change_passphrase_source(ctx, source):
     await require_confirm(ctx, text, ButtonRequestType.ProtectCall)
 
 
-async def require_confirm_change_display_rotation(ctx, rotation):
+async def require_confirm_change_display_rotation(
+    ctx: wire.Context, rotation: int
+) -> None:
     if rotation == 0:
         label = "north"
     elif rotation == 90:
@@ -91,6 +101,10 @@ async def require_confirm_change_display_rotation(ctx, rotation):
         label = "south"
     elif rotation == 270:
         label = "west"
+    else:
+        raise wire.DataError(
+            "Invalid display rotation. Allowed values are 0, 90, 180 or 270."
+        )
     text = Text("Change rotation", ui.ICON_CONFIG, new_lines=False)
     text.normal("Do you really want to", "change display rotation")
     text.normal("to")

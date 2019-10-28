@@ -25,6 +25,7 @@ from apps.common.sd_salt import (
 from apps.common.storage import device, is_initialized
 
 if False:
+    from typing import Awaitable
     from trezor.messages.SdProtect import SdProtect
 
 
@@ -149,7 +150,7 @@ async def sd_protect_refresh(ctx: wire.Context, msg: SdProtect) -> Success:
     return Success(message="SD card protection refreshed")
 
 
-def require_confirm_sd_protect(ctx: wire.Context, msg: SdProtect) -> None:
+def require_confirm_sd_protect(ctx: wire.Context, msg: SdProtect) -> Awaitable:
     if msg.operation == SdProtectOperationType.ENABLE:
         text = Text("SD card protection", ui.ICON_CONFIG)
         text.normal(

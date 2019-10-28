@@ -59,8 +59,8 @@ class InfoConfirm(ui.Layout):
             ui.display.bar_radius(x, y, w, h, bg_color, ui.BG, ui.RADIUS)
 
             # render the info text
-            render_text(  # type: ignore
-                self.text,
+            render_text(
+                self.text,  # type: ignore
                 new_lines=False,
                 max_lines=6,
                 offset_y=y + TEXT_LINE_HEIGHT,

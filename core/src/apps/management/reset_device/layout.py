@@ -1,6 +1,6 @@
 import ubinascii
 
-from trezor import ui, utils
+from trezor import ui, utils, wire
 from trezor.crypto import random
 from trezor.messages import BackupType, ButtonRequestType
 from trezor.ui.button import Button, ButtonDefault
@@ -17,8 +17,11 @@ from apps.common.layout import show_success
 if __debug__:
     from apps import debug
 
+if False:
+    from typing import List
 
-async def show_internal_entropy(ctx, entropy: bytes):
+
+async def show_internal_entropy(ctx: wire.Context, entropy: bytes) -> None:
     entropy_str = ubinascii.hexlify(entropy).decode()
     lines = utils.chunks(entropy_str, 16)
     text = Text("Internal entropy", ui.ICON_RESET)
@@ -26,7 +29,7 @@ async def show_internal_entropy(ctx, entropy: bytes):
     await require_confirm(ctx, text, ButtonRequestType.ResetDevice)
 
 
-async def confirm_backup(ctx):
+async def confirm_backup(ctx: wire.Context) -> bool:
     # First prompt
     text = Text("Success", ui.ICON_CONFIRM, ui.GREEN, new_lines=False)
     text.bold("New wallet created")
@@ -67,7 +70,12 @@ async def confirm_backup(ctx):
     )
 
 
-async def _show_share_words(ctx, share_words, share_index=None, group_index=None):
+async def _show_share_words(
+    ctx: wire.Context,
+    share_words: List[str],
+    share_index: int = None,
+    group_index: int = None,
+) -> None:
     first, chunks, last = _split_share_into_pages(share_words)
 
     if share_index is None:
@@ -269,7 +277,7 @@ async def show_backup_success(ctx):
 # ===
 
 
-async def bip39_show_and_confirm_mnemonic(ctx, mnemonic: str):
+async def bip39_show_and_confirm_mnemonic(ctx, mnemonic: str) -> None:
     # warn user about mnemonic safety
     await show_backup_warning(ctx)
 
